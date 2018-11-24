@@ -36,7 +36,8 @@ int main()
     while(k--)
     {
         int n;
-
+        cin >> n;
+        
     }
     return 0;   
 }
