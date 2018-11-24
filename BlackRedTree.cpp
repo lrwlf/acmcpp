@@ -11,6 +11,7 @@ void build(node *n, int v)
 {
     if (n == NULL)
     {
+        n = new node(); 
         n->l = NULL;
         n->r = NULL;
         n->v == v;
@@ -38,6 +39,12 @@ int main()
         int n;
         cin >> n;
         
+        for(int i = 0;i<n;i++)
+        {
+            int t;
+            cin >> t;
+            build()
+        }
     }
     return 0;   
 }
