@@ -7,44 +7,89 @@ struct node
     node *l;
     node *r;
 };
-void build(node *n, int v)
+void build(node *&n, int v) //root的别名，直接对root指针操作
 {
     if (n == NULL)
     {
-        n = new node(); 
+        n = new node();
         n->l = NULL;
         n->r = NULL;
-        n->v == v;
+        n->v = v;
         return;
     }
-    else if (abs(n->v) < v)
+    else if (abs(n->v) <= abs(v))
         build(n->l, v);
     else
         build(n->r, v);
 }
-void dfs(node *root)
+
+void dfs(node *root, int t, int &black)
 {
-    cout << root->v << endl;
-    if (root->r != NULL)
-        dfs(root->r);
-    if (root->l != NULL)
-        dfs(root->l);
+    if (root == NULL)
+    {
+        if (black == -1)
+            black = t;
+        else if (black != t)
+            black = -2;
+        return;
+    }
+    if (black == -2)
+        return;
+    if (root->v > 0)
+        t++;
+    dfs(root->l, t, black);
+    dfs(root->r, t, black);
+}
+bool bfs(node *root)
+{
+    queue<node *> q;
+    q.push(root);
+    if (root->v < 0)
+        return false;
+    while (!q.empty())
+    {
+        node *top = q.front();
+        q.pop();
+        int black = -1;
+        dfs(top, 0, black);
+        if (black == -2)
+            return false;
+        if (top->l != NULL)
+        {
+            if (top->v < 0 && top->l->v < 0)
+                return false;
+            else
+                q.push(top->l);
+        }
+        if (top->r != NULL)
+        {
+            if (top->v < 0 && top->r->v < 0)
+                return false;
+            else
+                q.push(top->r);
+        }
+    }
+    return true;
 }
 int main()
 {
     int k;
     cin >> k;
-    while(k--)
+    while (k--)
     {
         int n;
         cin >> n;
-        
-        for(int i = 0;i<n;i++)
+        node *tree = NULL;
+        for (int i = 0; i < n; i++)
         {
             int t;
             cin >> t;
-            build()
+            build(tree, t);
         }
+        if (bfs(tree) == true)
+            cout << "Yes" << endl;
+        else
+            cout << "No" << endl;
     }
-    return 0;   
+    return 0;
 }
