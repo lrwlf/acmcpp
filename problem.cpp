@@ -1,40 +1,52 @@
 #include <bits/stdc++.h>
-#define MAX 100010
+#define MAX 1010
 using namespace std;
-int a[MAX];
+int n, m;
+int a[MAX][MAX];
+int mark[MAX];
+int ans = 1;
+int deg[MAX];
+void dfs(int x)
+{
+    mark[x] = 1;
+    for (int i = 1; i <= n; i++)
+    {
+        if (a[x][i] == 1 && mark[i] == 0)
+            dfs(i);
+    }
+}
+
 int main()
 {
     ios::sync_with_stdio(false);
-    int t;
-    cin >> t;
-    for (int k = 0; k < t; k++)
+    cin >> n >> m;
+    for (int k = 0; k < m; k++)
     {
-        int n;
-        cin >> n;
-        cin >> a[0];
-        for (int i = 1; i < n; i++)
-        {
-            int temp;
-            cin >> temp;
-            a[i] = temp - a[i - 1];
-        }
-
-        int ans = 1;
-        double hou = a[n - 1];
-        for (int i = n - 2; i >= 0; i--)
-        {
-            int temp = 1;
-            if (hou < a[i])
-            {
-                temp += a[i] / ceil(hou);
-                hou = a[i] * 1.0 / temp;
-            }
-            else
-                hou = a[i];
-
-            ans += temp;
-        }
-        cout << "Case #" << t << ": " << ans << endl;
+        int t1, t2;
+        cin >> t1 >> t2;
+        a[t1][t2] = 1;
+        a[t2][t1] = 1;
+        deg[t1]++;
+        deg[t2]++;
     }
+    dfs(1);
+    for (int i = 1; i <= n; i++)
+    {
+        if (mark[i] == 0)
+        {
+            cout << 0 << endl;
+            return 0;
+        }
+    }
+    for (int i = 1; i <= n; i++)
+    {
+        if (deg[i]%2!=0)
+            {
+                ans = 0;
+                break;
+            }
+    }
+
+    cout << ans << endl;
     return 0;
 }
