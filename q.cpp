@@ -1,31 +1,66 @@
-#include<iostream>
-#define Max 101
+#include<bits/stdc++.h>
+#define ll long long
+#define MAX 10010
 using namespace std;
-char str1[Max],str2[Max];
-int AnswerCorrect(char a[],char b[],int m)
+int n;
+int edge[MAX][MAX];
+int dis[MAX];
+int mk[MAX];
+void dijkstra(int v)
 {
-    if(m==0)
+    for(int i=0; i<n; i++)
     {
-        return 0;
-    }
-    int i;
-    for(i=0;i<m;i++)
-    {
-        if(b[i]==a[0])
+        if(i!=v)
         {
-             break;
+            dis[i] = edge[v][i];
         }
     }
-    int c= AnswerCorrect(a+1,b,i)+1;
-    int d= AnswerCorrect(a+i+1,b+i+1,m-i-1)+1;
-    return c>d?c:d;
+    mk[v] = 1;
+    for(int i=1; i<n; i++)
+    {
+        int mins = INT_MAX;
+        int u = v;
+        for(int j=0; j<n; ++j)
+            if(!mk[j]&&dis[j]<mins)
+            {
+                u=j;
+                mins=dis[j];
+            }
+        mk[u] = 1;
+        for(int j=0; j<n; j++)
+            if(!mk[i]&&edge[u][j]<INT_MAX)
+            {
+                if(dis[u]+edge[u][j]<dis[j])
+                {
+                    dis[j] = dis[u]+edge[u][j];
+                }
+            }
+
+    }
 }
 int main()
 {
-    int n;
-    cin>>n;
-    cin>>str1>>str2;
-    cout<< AnswerCorrect(str1,str2,n)<<endl;
+    scanf("%d",&n);
+    for(int i = 0; i<n; i++)
+    {
+        for(int j=0; j<n; j++)
+        {
+            scanf("%d",&edge[i][j]);
+            if(edge[i][j]<0)
+            {
+                printf("not possible");
+                return 0;
+            }
+            else if(edge[i][j]==0&&i!=j)
+                edge[i][j] = INT_MAX;
+        }
+    }
+    dijkstra(0);
+    for(int i = 0; i<n; i++)
+    {
+        if(i!=0)
+            printf(" ");
+        printf("%d",dis[i]);
+    }
     return 0;
- 
 }
