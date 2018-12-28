@@ -1,10 +1,11 @@
 #include <bits/stdc++.h>
+using namespace std;
 #define MaxVertexNum 100
 typedef struct
 {
     int num;
-    char name[100];
-    char features[200];
+    string name;
+    string features;
 } VertexType;
 typedef int EdgeType;
 typedef struct
@@ -13,23 +14,160 @@ typedef struct
     EdgeType edges[MaxVertexNum][MaxVertexNum];
     int n, e;
 } Graph;
-int dis[MAX][MAX]; //å‚¨å­˜æœ€çŸ­è·¯å¾„
-int 
-void create(Graph *G);
-VertexType GetVex(Graph *G, int v);
-void PutVertex(Graph *G,int v);
-void InsertVertex(Graph *G, VertexType v);
-void DeleteVertex(Graph *G, VertexType v);
-void InsertArc(Graph *G, int v1,int v2, int w);
-void DeleteArc(Graph *G, int v1, int v2);
-void ShortestPath(Graph *G, int v);
-void ToDestination(Graph *G, int v1, int v2);
-
+int dis[MaxVertexNum][MaxVertexNum]; //´¢´æ×î¶ÌÂ·¾¶
+int pre[MaxVertexNum][MaxVertexNum]; //´¢´æÇ°Çı½áµã
+void create(Graph *G);              //½¨Á¢Í¼µÄ´¢´æ½á¹¹
+VertexType GetVex(Graph *G, int v);     //»ñÈ¡¶¥µã
+void PutVertex(Graph *G, int v);        //ĞŞ¸Ä¾°µãĞÅÏ¢
+void InsertVertex(Graph *G, VertexType v);  //²åÈë¾°µã
+void DeleteVertex(Graph *G, int v);         //É¾³ı¾°µã
+void InsertArc(Graph *G, int v1, int v2, int w);    //²åÈëµÀÂ·
+void DeleteArc(Graph *G, int v1, int v2);       //É¾³ıµÀÂ·
+void ShortestPath(Graph *G, int v);     //Êä³öÒ»¸öÔ­µãµ½ÆäËûËùÓĞ¾°µãµÄ×î¶ÌÂ·¾¶
+void ToDestination(Graph *G, int v1, int v2); //Á½¸ö¾°µãÖ®¼äµÄ×î¶ÌÂ·¾¶
+int findIndex(Graph *G, int v); //ÓĞ¾°µã´úºÅÕÒµ½¾°µãÔÚ¾ØÕóÖĞµÄ´¢´æÎ»ÖÃ
+void printWay(Graph *G, int v1, int v2);   //´òÓ¡³öÁ½µãÖ®¼äµÄ×î¶ÌÂ·¾¶
+void Floyd(Graph *G);   //¸¥ÂåÒÁµÂËã·¨
+void printls(Graph *G); //´òÓ¡¾°µãÁĞ±í
+void printInf(Graph *G, int v); //´òÓ¡¾°µãĞÅÏ¢
+void printEdges(Graph *G); //´òÓ¡ËùÓĞµÀÂ·
 int main()
 {
     Graph g;
-    create(&g);
-    system("pause");
+    int mode, choice;
+    while (1)
+    {
+        printf("1.¹ÜÀíÔ±Éí·İµÇÂ½\n"
+               "2.ÓÎ¿ÍÉí·İµÇÂ½\n"
+               "3.ÍË³ö\n"
+               "ÊäÈëÄãµÄÑ¡Ôñ£º");
+        while (!scanf("%d", &mode))
+            while (getchar() != '\n')
+                ;
+        system("cls");
+        while (1)
+        {
+            if (mode == 1)
+            {
+                printf("£¨1£© ´´½¨Í¼µÄÁÚ½Ó¾ØÕó´æ´¢½á¹¹\n"
+                       "£¨2£© ä¯ÀÀÍ¼ÖĞÈÎÒ»¾°µã½éÉÜ\n"
+                       "£¨3£© ĞŞ¸Ä¾°µãĞÅÏ¢\n"
+                       "£¨4£© Ôö¼Ó¾°µãĞÅÏ¢\n"
+                       "£¨5£© É¾³ı¾°µãĞÅÏ¢\n"
+                       "£¨6£© Ôö¼ÓµÀÂ·\n"
+                       "£¨7£© É¾³ıµÀÂ·\n"
+                       "£¨8£© ²éÕÒÄ³Ò»¾°µãµ½ÆäËû¾°µãµÄ×î¶ÌÂ·¾¶\n"
+                       "£¨9£© ²éÕÒÈÎÒ»Á½¸ö¾°µãÖ®¼äµÄ×î¶ÌÂ·¾¶\n"
+                       "£¨10£©ÍË³öµÇÂ¼\n");
+                printf("ÊäÈëÒ»¸öÕûÊı:");
+                cin >> choice;
+                system("cls");
+            }
+            else if (mode == 2)
+            {
+                printf("£¨2£© ä¯ÀÀÍ¼ÖĞÈÎÒ»¾°µã½éÉÜ\n"
+                       "£¨8£© ²éÕÒÄ³Ò»¾°µãµ½ÆäËû¾°µãµÄ×î¶ÌÂ·¾¶\n"
+                       "£¨9£© ²éÕÒÈÎÒ»Á½¸ö¾°µãÖ®¼äµÄ×î¶ÌÂ·¾¶\n"
+                       "£¨10£©ÍË³öµÇÂ¼\n");
+                printf("ÊäÈëÒ»¸öÕûÊı:");
+                do
+                {
+                    cin >> choice;
+                    if (!(choice == 2 || choice == 8 || choice == 9 || choice == 10))
+                        printf("Ã»ÓĞÈ¨ÏŞ\n");
+                } while (!(choice == 2 || choice == 8 || choice == 9 || choice == 10));
+                system("cls");
+            }
+            else
+                return 0;
+
+            if (choice == 1)
+                create(&g);
+            else if (choice == 2)
+            {
+                printls(&g);
+                int Ves;
+                printf("ÇëÊäÈëÄãÏëä¯ÀÀµÄ¾°µã´úºÅ£º");
+                cin >> Ves;
+                system("cls");
+                printInf(&g, Ves);
+                system("pause");
+                system("cls");
+            }
+            else if (choice == 3)
+            {
+                int v;
+                printls(&g);
+                printf("ÊäÈëÄãÏëĞŞ¸ÄµÄ¾°µã´úºÅ£º");
+                cin >> v;
+                system("cls");
+                PutVertex(&g, v);
+            }
+            else if (choice == 4)
+            {
+                VertexType v;
+                cout << "ĞÂ¾°µãµÄÃû³Æ£º";
+                cin >> v.name;
+                cout << "ĞÂ¾°µãµÄ¼ò½é:";
+                cin >> v.features;
+                cout << "ÊäÈë¶¥µã´úºÅ(ÇëÎğÓëÆäËû¶¥µã±àºÅÖØ¸´)£º";
+                cin >> v.num;
+                system("cls");
+                InsertVertex(&g, v);
+            }
+            else if (choice == 5)
+            {
+                printls(&g);
+                int t;
+                cout << "ÊäÈëÄãÏëÉ¾³ıµÄ¾°µã´úºÅ:";
+                cin >> t;
+                DeleteVertex(&g, t);
+                system("cls");
+            }
+            else if (choice == 6)
+            {
+                printls(&g);
+                cout << "ÊäÈëµÀÂ·µÄÆğµã´úºÅ ÖÕµã´úºÅ ³¤¶È£¬ÀıÈç£¨1 2 200£©£º";
+                int t1, t2, w;
+                cin >> t1 >> t2 >> w;
+                InsertArc(&g, t1, t2, w);
+                system("cls");
+            }
+            else if (choice == 7)
+            {
+                printEdges(&g);
+                cout << "ÒªÉ¾³ıÊäÈëµÀÂ·µÄÆğµã´úºÅ ÖÕµã´úºÅ£º";
+                int t1, t2;
+                cin >> t1 >> t2;
+                DeleteArc(&g, t1, t2);
+                system("cls");
+            }
+            else if (choice == 8)
+            {
+                int v;
+                printls(&g);
+                cout << "ÊäÈëÔ´µã´úºÅ:";
+                cin >> v;
+                system("cls");
+                ShortestPath(&g, v);
+                system("pause");
+                system("cls");
+            }
+            else if (choice == 9)
+            {
+                int v1, v2;
+                printls(&g);
+                cout << "ÊäÈëÆğµãÓëÖÕµã´úºÅ:";
+                cin >> v1 >> v2;
+                system("cls");
+                ToDestination(&g, v1, v2);
+                system("pause");
+                system("cls");
+            }
+            else if (choice == 10)
+                break;
+        }
+    }
     return 0;
 }
 
@@ -37,14 +175,13 @@ void create(Graph *G)
 {
     VertexType temp;
     int i, x, y, w;
-    char f = '\0';
-    printf("è¾“å…¥æ™¯ç‚¹ä¸ªæ•°ï¼š");
-    while (!scanf("%d", &G->n))while (getchar() != '\n');
-    for(int i=0;i<n;i++)    //åˆå§‹åŒ–è·¯å¾„
+    printf("ÊäÈë¾°µã¸öÊı£º");
+    cin >> G->n;
+    for (int i = 0; i < G->n; i++) //³õÊ¼»¯Â·¾¶
     {
-        for(int j=0;j<n;j++)
+        for (int j = 0; j < G->n; j++)
         {
-            if(i==j)
+            if (i == j)
                 G->edges[i][j] = 0;
             else
                 G->edges[i][j] = INT_MAX;
@@ -53,118 +190,197 @@ void create(Graph *G)
     system("cls");
     for (i = 0; i < G->n; i++)
     {
-        printf("ä»£å·:");
-        while (!scanf("%d", &temp.num))
-            while (getchar() != '\n')
-                ;
+        printf("´úºÅ:");
+        cin >> temp.num;
         getchar();
-        printf("åç§°:");
-        fgets(temp.name, sizeof(temp.name), stdin);
-        printf("ç®€ä»‹:\n");
-        fgets(temp.features, sizeof(temp.features), stdin);
+        printf("Ãû³Æ:");
+        cin >> temp.name;
+        printf("¼ò½é:\n");
+        cin >> temp.features;
         G->vexs[i] = temp;
         system("cls");
     }
-    printf("è¾“å…¥è·¯çš„æ¡æ•°:");
-    while (!scanf("%d", &G->e))while (getchar() != '\n');
+    printf("ÊäÈëÂ·µÄÌõÊı:");
+    cin >> G->e;
     for (i = 0; i < G->e; i++)
     {
-        printf("è¾“å…¥èµ·ç‚¹ä»£å·,ç»ˆç‚¹ä»£å·,è·¯é•¿ï¼ˆä¾‹å¦‚ï¼š1 5 3ï¼‰ï¼š");
+        printls(G); //´òÓ¡¾°µãÁĞ±í
+        printf("ÊäÈëÆğµã´úºÅ,ÖÕµã´úºÅ,Â·³¤£¨ÀıÈç£º1 5 3£©£º");
         while (scanf("%d %d %d", &x, &y, &w) != 3)
             printf("Re-Input:");
-        for(int i = 0;i<G->n;i++)  //åœ¨é¡¶ç‚¹é›†åˆä¸­æ‰¾åˆ°æ™¯ç‚¹ä»£å·å‚¨å­˜çš„ä½ç½®
-        {
-            if(G->vexs[i].num==y)
-               {y = i;
-               break;}
-        }
-        for(int i = 0;i<G->n;i++)  //åœ¨é¡¶ç‚¹é›†åˆä¸­æ‰¾åˆ°æ™¯ç‚¹ä»£å·å‚¨å­˜çš„ä½ç½®
-        {
-            if(G->vexs[i].num==x)
-               {x = i;
-               break;}
-        }
-
+        y = findIndex(G, y); //ÔÚ¶¥µã¼¯ºÏÖĞÕÒµ½¾°µã´úºÅ´¢´æµÄÎ»ÖÃ
+        x = findIndex(G, x);
         G->edges[x][y] = w;
         G->edges[y][x] = w;
+        system("cls");
     }
-    printf("æˆåŠŸï¼")
+    Floyd(G); //¼ÆËã×îÓÅÂ·¾¶
+    printf("³É¹¦£¡");
+    system("pause");
     system("cls");
     fflush(stdin);
 }
-VertexType GetVex(Graph *G, int v) //æ‰“å°æ™¯ç‚¹ä¿¡æ¯,vä¸ºæ™¯ç‚¹ä»£å·
+VertexType GetVex(Graph *G, int v) //´òÓ¡¾°µãĞÅÏ¢,vÎª¾°µã´úºÅ
 {
-     for(int i = 0;i<G->n;i++)  //åœ¨é¡¶ç‚¹é›†åˆä¸­æ‰¾åˆ°æ™¯ç‚¹ä»£å·å‚¨å­˜çš„ä½ç½®
-        {
-            if(G->vexs[i].num==v)
-               {
-                    return G->vexs[i];
-               }
-        }
+    return G->vexs[findIndex(G, v)];
 }
-void PutVertex(Graph *G,int v)
+void PutVertex(Graph *G, int v)
 {
-      for(int i = 0;i<G->n;i++)  //åœ¨é¡¶ç‚¹é›†åˆä¸­æ‰¾åˆ°æ™¯ç‚¹ä»£å·å‚¨å­˜çš„ä½ç½®
+    int i = findIndex(G, v); //ÔÚ¶¥µã¼¯ºÏÖĞÕÒµ½¾°µã´úºÅ´¢´æµÄÎ»ÖÃ
+    if (G->vexs[i].num == v)
+    {
+        char j;
+        string t;
+        printf("ÊÇ·ñĞŞ¸ÄÃû³Æ£¿£¨Y/N£©");
+        fflush(stdin);
+        j = getchar();
+        if (j == 'Y' || j == 'y')
         {
-            if(G->vexs[i].num==v)
-               {
-                    char j,t[255];
-                    printf("æ˜¯å¦ä¿®æ”¹åç§°ï¼Ÿï¼ˆY/Nï¼‰")
-                    j = getchar();
-                    fflush(stdin);
-                    system("cls");
-                    if(j=='Y'||j=='y')
-                    {
-                        scanf("%s",t);
-                        G->vexs[i].name = t;
-                    }
-                    printf("æ˜¯å¦ä¿®æ”¹ç®€ä»‹ï¼Ÿï¼ˆY/Nï¼‰")
-                    j = getchar();
-                    fflush(stdin);
-                    system("cls");
-                    if(j=='Y'||j=='y')
-                    {
-                        scanf("%s",t);
-                        G->vexs[i].features = t;
-                    }
-                    printf("success");
-                    return;
-               }
+            cout << "ÇëÊäÈëĞÂÃû³Æ£º";
+            cin >> t;
+            G->vexs[i].name = t;
         }
+        printf("ÊÇ·ñĞŞ¸Ä¼ò½é£¿£¨Y/N£©");
+        fflush(stdin);
+        j = getchar();
+        if (j == 'Y' || j == 'y')
+        {
+            cout << "ÇëÊäÈëĞÂµÄ¼ò½é:" << endl;
+            cin >> t;
+            G->vexs[i].features = t;
+        }
+        system("cls");
+        return;
+    }
 }
 void InsertVertex(Graph *G, VertexType v)
 {
-    G->vex[n] = v;      //é¡¶ç‚¹
-    G->n++;             //æ™¯ç‚¹æ•°åŠ 1
+    G->vexs[G->n] = v; //¶¥µã
+    G->n++;            //¾°µãÊı¼Ó1
 }
-void InsertArc(Graph *G, int v1,int v2,int w)
+void InsertArc(Graph *G, int v1, int v2, int w)
 {
-    int x,y;
-     for(int i = 0;i<G->n;i++)  //åœ¨é¡¶ç‚¹é›†åˆä¸­æ‰¾åˆ°æ™¯ç‚¹ä»£å·å‚¨å­˜çš„ä½ç½®
-        {
-            if(G->vexs[i].num==v1)
-               {
-                    x = i;
-                    break;
-               }
-        }
-    for(int i = 0;i<G->n;i++)  //åœ¨é¡¶ç‚¹é›†åˆä¸­æ‰¾åˆ°æ™¯ç‚¹ä»£å·å‚¨å­˜çš„ä½ç½®
-        {
-            if(G->vexs[i].num==v2)
-               {
-                    y = i;
-                    break;
-               }
-        }
+    int x, y;
+    y = findIndex(G, v1);
+    x = findIndex(G, v2);
     G->edges[x][y] = w;
-    G->edges[y][x] = w; //å¢åŠ è·¯å¾„
+    G->edges[y][x] = w; //Ôö¼ÓÂ·¾¶
+    G->e++;
+    Floyd(G);           //ÖØĞÂ¼ÆËãÂ·¾¶
 }
 void DeleteArc(Graph *G, int v1, int v2)
 {
-    G->edges[v1][v2] = INT_MAX; //è·¯é•¿è®¾ä¸ºæ— ç©·å¤§å³ä¸ºåˆ é™¤è·¯å¾„
+    v1 = findIndex(G, v1);
+    v2 = findIndex(G, v2);
+    G->edges[v1][v2] = INT_MAX; //Â·³¤ÉèÎªÎŞÇî´ó¼´ÎªÉ¾³ıÂ·¾¶
     G->edges[v2][v1] = INT_MAX;
+    G->e--;
+    Floyd(G); //ÖØĞÂ¼ÆËãÂ·¾¶
 }
 void Floyd(Graph *G)
 {
+    for (int i = 0; i < G->n; i++)
+        for (int j = 0; j < G->n; j++)
+        {
+            dis[i][j] = G->edges[i][j]; //³õÊ¼»¯×î¶ÌÂ·¾¶
+            pre[i][j] = j;
+        }
+    for (int k = 0; k < G->n; k++)
+        for (int i = 0; i < G->n; i++)
+            for (int j = 0; j < G->n; j++)
+                if (dis[i][k] != INT_MAX && dis[k][j] != INT_MAX && dis[i][j] > dis[i][k] + dis[k][j])
+                {
+                    dis[i][j] = dis[i][k] + dis[k][j];
+                    pre[i][j] = pre[i][k];
+                }
+    return;
+}
+int findIndex(Graph *G, int v) //²éÕÒ´úºÅµÄÎ»ÖÃ
+{
+    for (int i = 0; i < G->n; i++)
+    {
+        if (G->vexs[i].num == v)
+            return i;
+    }
+}
+void printWay(Graph *G, VertexType v1, VertexType v2)
+{
 
+    int x = findIndex(G, v1.num);
+    int y = findIndex(G, v2.num);
+    while (x != y)
+    {
+        cout << G->vexs[x].name<<"--->";
+        x = pre[x][y];
+    }
+    cout << v2.name << endl;
+}
+void ToDestination(Graph *G, int v1, int v2)
+{
+    v1 = findIndex(G, v1);
+    v2 = findIndex(G, v2);
+    if (dis[v1][v2] == INT_MAX)
+    {
+        cout << "ÎŞÍ¨Â·" << endl;
+        system("pause");
+        system("cls");
+        return;
+    }
+    printf("×î¶ÌÂ·¾¶³¤¶ÈÎª£º%d\n", dis[v1][v2]);
+    printWay(G, G->vexs[v1], G->vexs[v2]);
+}
+void ShortestPath(Graph *G, int v)
+{
+    v = findIndex(G, v);
+    for (int i = 0; i < G->n; i++)
+    {
+        if (i == v)
+            continue;
+        else if (dis[v][i] == INT_MAX)
+            cout << G->vexs[v].name << "µ½" << G->vexs[i].name << "ÎŞÍ¨Â·" << endl;
+        else
+        {
+            cout << G->vexs[v].name << "µ½" << G->vexs[i].name << "µÄ×î¶Ì¾àÀëÎª" << dis[v][i] << endl;
+            printWay(G, G->vexs[v], G->vexs[i]);
+        }
+    }
+}
+void printls(Graph *G)
+{
+    for (int i = 0; i < G->n; i++)
+    {
+        cout << G->vexs[i].num << " " << G->vexs[i].name << endl;
+    }
+}
+void printInf(Graph *G, int v)
+{
+    VertexType t = GetVex(G, v);
+    cout << "num:" << t.num << endl;
+    cout << "name:" << t.name << endl;
+    cout << "features:" << t.features << endl;
+}
+void DeleteVertex(Graph *G, int v)
+{
+    v = findIndex(G, v);
+    for (int i = v; i < G->n; i++)
+    {
+        G->vexs[v] = G->vexs[v + 1]; //É¾³ıºóµ÷Õû½áµã
+        G->edges[v][i] = G->edges[v + 1][i];
+        G->edges[i][v] = G->edges[v + 1][i];
+    }
+    G->n--;
+    Floyd(G); //ÖØĞÂ¼ÆËã×î¶ÌÂ·¾¶
+}
+void printEdges(Graph *G) //´òÓ¡ËùÓĞÂ·¾¶
+{
+    for (int i = 0; i < G->n; i++)
+    {
+        for (int j = i + 1; j < G->n; j++)
+        {
+            if (G->edges[i][j] != INT_MAX)
+            {
+                cout << G->vexs[i].num << " " << G->vexs[i].name << "<--->" << G->vexs[j].num << " " << G->vexs[j].name << " " << G->edges[i][j] << endl;
+            }
+        }
+    }
 }
